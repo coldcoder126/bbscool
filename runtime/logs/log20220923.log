@@ -1,0 +1,18 @@
+[ERROR][form.go:37]2022/09/23 08:50:01 [密码必能为空;用户名不能为空]
+[ERROR][main.go:72]2022/09/23 08:50:28 [start http server error http: Server closed]
+[ERROR][form.go:37]2022/09/23 08:51:15 [密码不能为空;用户名不能为空]
+[ERROR][form.go:37]2022/09/23 08:58:55 [密码不能为空;用户名不能为空]
+[ERROR][form.go:37]2022/09/23 09:01:58 [密码不能为空;用户名不能为空]
+[ERROR][form.go:31]2022/09/23 09:06:19 [Key: 'RegParamName.Username' Error:Field validation for 'Username' failed on the 'required' tag
+Key: 'RegParamName.Password' Error:Field validation for 'Password' failed on the 'required' tag]
+[ERROR][form.go:32]2022/09/23 09:11:09 [Key: 'RegParamName.Username' Error:Field validation for 'Username' failed on the 'required' tag
+Key: 'RegParamName.Password' Error:Field validation for 'Password' failed on the 'required' tag]
+[ERROR][form.go:31]2022/09/23 21:34:48 [Key: 'RefreshToken.Token' Error:Field validation for 'Token' failed on the 'required' tag]
+[ERROR][form.go:31]2022/09/23 21:35:39 [Key: 'RefreshToken.Token' Error:Field validation for 'Token' failed on the 'required' tag]
+[ERROR][form.go:31]2022/09/23 21:37:51 [Key: 'RefreshToken.RefreshToken' Error:Field validation for 'RefreshToken' failed on the 'required' tag]
+[ERROR][main.go:72]2022/09/23 21:38:55 [start http server error http: Server closed]
+[ERROR][form.go:31]2022/09/23 21:39:40 [Key: 'RefreshToken.RefreshToken' Error:Field validation for 'RefreshToken' failed on the 'required' tag]
+[ERROR][form.go:31]2022/09/23 21:42:48 [Key: 'RfToken.RefreshToken' Error:Field validation for 'RefreshToken' failed on the 'required' tag]
+[ERROR][form.go:31]2022/09/23 21:44:16 [Key: 'RfTokenParam.RefreshToken' Error:Field validation for 'RefreshToken' failed on the 'required' tag]
+[ERROR][form.go:31]2022/09/23 21:49:03 [Key: 'RfTokenParam.RefreshToken' Error:Field validation for 'RefreshToken' failed on the 'required' tag]
+[ERROR][form.go:31]2022/09/23 21:52:28 [Key: 'RfTokenParam.Refreshtoken' Error:Field validation for 'Refreshtoken' failed on the 'required' tag]

@@ -1,0 +1,11 @@
+
+-----
+OPT_NAME
+local subNum = tonumber(ARGV[1])
+local curNum = tonumber(redis.call('hget',KEYS[1],KEYS[2]))
+if (subNum > curNum)
+then
+return {-1}
+else
+redis.call('hset',KEYS[1],KEYS[2],curNum-subNum)
+return {1} end
