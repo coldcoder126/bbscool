@@ -4,6 +4,8 @@ const (
 	ContextKeyUserObj  = "authedUserObj"
 	RedisPrefixInfo    = "info:"
 	RedisPrefixAuth    = "auth:"
+	RedisPrefixPostQue = "que:"
+	RedisPrefixPostSet = "set"
 	CASBIN             = "gin-shop"
 	WeChatMenu         = "wechat_menus"
 	AppRedisPrefixAuth = "app_auth:"

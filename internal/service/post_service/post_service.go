@@ -4,12 +4,18 @@ import (
 	"bbs/internal/model"
 	"bbs/internal/service/point_service"
 	"bbs/pkg/cache"
+	"bbs/pkg/constant"
 	"bbs/pkg/global"
+	"encoding/json"
 	"github.com/pkg/errors"
+	"strconv"
 )
 
 const (
 	SysID = iota + 1
+
+	QueLen = 50
+	SetLen = 50
 )
 
 // AddOne 新增一条
@@ -27,15 +33,30 @@ func AddOne(post *model.Post, userId int64) (err error) {
 	}()
 
 	// 更新用户mysql中的积分信息
-
-	err = point_service.PointSub(cache.GetRedisClient(cache.DefaultRedisClient), tx, userId, int64(SysID), point_service.PointOptPost)
-	if err != nil {
-		return errors.Wrapf(err, "%s point decrease failed ", fName)
+	if err = point_service.PointSubInDb(tx, userId, int64(SysID), point_service.PointOptPost); err != nil {
+		return errors.Wrapf(err, "%s point decrease failed in db ", fName)
 	}
 
 	// 创建帖子
 	if err = tx.Create(post).Error; err != nil {
 		return errors.Wrapf(err, "%s post publish failed", fName)
+	}
+
+	//数据库都成功了再更新redis
+	//更新redis中的分数
+	if _, err = point_service.PointSubInCache(cache.GetRedisClient(cache.DefaultRedisClient), userId, point_service.PointOptPost); err != nil {
+		return errors.Wrapf(err, " %s redis failed ", fName)
+	}
+
+	// 如果是校级范围，将帖子信息写入redis
+	// todo 公共级别帖子采用推荐流的方式
+	if post.Scope > 100 {
+		queKey := constant.RedisPrefixPostQue + strconv.Itoa(int(post.Scope))
+		setKey := constant.RedisPrefixPostSet + strconv.Itoa(int(post.Scope))
+		postStr, err := json.Marshal(post)
+		
+		rds := cache.GetRedisClient(cache.DefaultRedisClient)
+		rds.EvalSha(cache.Lua[cache.PostToQue], "POST_TO_QUE", []string{queKey})
 	}
 
 	// 按发布时间，将帖子放入redis队列中

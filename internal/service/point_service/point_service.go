@@ -3,7 +3,6 @@ package point_service
 import (
 	"bbs/internal/model"
 	"bbs/pkg/cache"
-	"bbs/pkg/constant"
 	"fmt"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
@@ -47,8 +46,8 @@ func getPointByOpt(uid int64, opt int) int {
 	return 0
 }
 
-// pointSubInCache 封装redis中的分数减少操作，只需传入用户id和操作即可
-func pointSubInCache(redis *cache.Redis, userId int64, opt int) (int64, error) {
+// PointSubInCache 封装redis中的分数减少操作，只需传入用户id和操作即可
+func PointSubInCache(redis *cache.Redis, userId int64, opt int) (int64, error) {
 	funcName := "cache.DoScoreSub"
 	score := getPointByOpt(userId, opt)
 	if score <= 0 {
@@ -92,7 +91,7 @@ func PointInit(tx *gorm.DB, userId int64) (err error) {
 }
 
 // PointSubInDb 数据库中减分数操作
-func pointSubInDb(tx *gorm.DB, fromId, toId int64, optCode int) (err error) {
+func PointSubInDb(tx *gorm.DB, fromId, toId int64, optCode int) (err error) {
 	fName := "point_service."
 	score := getPointByOpt(fromId, optCode)
 	opt := Opt(optCode)
@@ -106,24 +105,6 @@ func pointSubInDb(tx *gorm.DB, fromId, toId int64, optCode int) (err error) {
 	pr := &model.PointRecord{FromId: fromId, ToId: toId, Opt: opt, Change: score}
 	if err = pr.Insert(tx); err != nil {
 		return errors.Wrap(err, fName)
-	}
-	return nil
-}
-
-func PointSub(redis *cache.Redis, tx *gorm.DB, fromId, toId int64, optCode int) (err error) {
-	if err = pointSubInDb(tx, fromId, toId, optCode); err != nil {
-		return err
-	}
-
-	// 更新用户redis中的积分信息
-	// todo 如果mysql和redis保持一致性，是不是就不用检查redis中的分数了
-	val, err := pointSubInCache(redis, fromId, optCode)
-	if err != nil {
-		return err
-	}
-	if val < 0 {
-		//积分不足
-		return constant.ErrorScoreInsufficient
 	}
 	return nil
 }
