@@ -54,14 +54,18 @@ func AddOne(post *model.Post, userId int64) (err error) {
 		queKey := constant.RedisPrefixPostQue + strconv.Itoa(int(post.Scope))
 		setKey := constant.RedisPrefixPostSet + strconv.Itoa(int(post.Scope))
 		postStr, err := json.Marshal(post)
-		
+		if err != nil {
+			return errors.Wrap(err, "post json failed in "+fName)
+		}
+
+		//按发布时间和最新更新时间，将帖子放入redis队列中
 		rds := cache.GetRedisClient(cache.DefaultRedisClient)
-		rds.EvalSha(cache.Lua[cache.PostToQue], "POST_TO_QUE", []string{queKey})
+		rds.EvalSha(cache.Lua[cache.PostToQue], "POST_TO_QUE", []string{queKey}, QueLen, string(postStr))
+		rds.EvalSha(cache.Lua[cache.PointSub], "POST_TO_SET", []string{setKey}, SetLen, string(postStr))
+
+		// todo 1.将post信息放入队列，消费后写入ES
 	}
 
-	// 按发布时间，将帖子放入redis队列中
-
-	// todo 1.将post信息放入队列，消费后写入ES
 	return nil
 }
 
