@@ -2,7 +2,7 @@ package jwt
 
 import (
 	"bbs/internal/model"
-	"bbs/internal/model/vo"
+	"bbs/internal/model/VO"
 	"bbs/pkg/cache"
 	"bbs/pkg/constant"
 	"bbs/pkg/global"
@@ -32,7 +32,7 @@ var (
 )
 
 type userStdClaims struct {
-	vo.JwtUser
+	VO.JwtUser
 	//*models.User
 	jwt.RegisteredClaims
 }
@@ -50,7 +50,7 @@ func GenerateAppToken(m *model.SysUser, d time.Duration) (string, error) {
 		Issuer:    "bbsAppGo",
 	}
 
-	var jwtUser = vo.JwtUser{
+	var jwtUser = VO.JwtUser{
 		Id:       m.Id,
 		Username: m.Username,
 	}
@@ -85,7 +85,7 @@ func GenerateToken(m *model.SysUser) (string, string, error) {
 		Issuer:    "bbsGo",
 	}
 
-	var jwtUser = vo.JwtUser{
+	var jwtUser = VO.JwtUser{
 		Id:       m.Id,
 		Username: m.Username,
 		Status:   m.Status,
@@ -107,7 +107,7 @@ func GenerateToken(m *model.SysUser) (string, string, error) {
 		ExpiresAt: jwt.NewNumericDate(time.Now().Add(TtlRefresh)),
 		Issuer:    "bbsGo",
 	}
-	var rUser = vo.JwtUser{
+	var rUser = VO.JwtUser{
 		Id: m.Id,
 	}
 	rClaims := userStdClaims{
@@ -134,13 +134,13 @@ func GenerateToken(m *model.SysUser) (string, string, error) {
 	return tokenString, refreshString, err
 }
 
-//返回id
+// 返回id
 func GetAppUserId(c *gin.Context) (int64, error) {
 	u, exist := c.Get(constant.AppAuthUser)
 	if !exist {
 		return 0, errors.New("can't get user id")
 	}
-	user, ok := u.(*vo.JwtUser)
+	user, ok := u.(*VO.JwtUser)
 
 	if ok {
 		return user.Id, nil
@@ -148,20 +148,20 @@ func GetAppUserId(c *gin.Context) (int64, error) {
 	return 0, errors.New("can't convert to user struct")
 }
 
-//返回user
-func GetAppUser(c *gin.Context) (*vo.JwtUser, error) {
+// 返回user
+func GetAppUser(c *gin.Context) (*VO.JwtUser, error) {
 	u, exist := c.Get(constant.AppAuthUser)
 	if !exist {
 		return nil, errors.New("can't get user id")
 	}
-	user, ok := u.(*vo.JwtUser)
+	user, ok := u.(*VO.JwtUser)
 	if ok {
 		return user, nil
 	}
 	return nil, errors.New("can't convert to user struct")
 }
 
-//返回 detail user
+// 返回 detail user
 func GetAppDetailUser(c *gin.Context) (*model.SysUser, error) {
 	mytoken := c.Request.Header.Get("Authorization")
 	if mytoken == "" {
@@ -191,7 +191,7 @@ func RemoveAppUser(c *gin.Context) error {
 	return cache.GetRedisClient(cache.DefaultRedisClient).Delete(key)
 }
 
-func ValidateToken(tokenString string) (*vo.JwtUser, error) {
+func ValidateToken(tokenString string) (*VO.JwtUser, error) {
 	if tokenString == "" {
 		return nil, constant.ErrorInvalidToken
 	}
@@ -216,13 +216,13 @@ func ValidateToken(tokenString string) (*vo.JwtUser, error) {
 
 }
 
-//返回id
+// 返回id
 func GetAdminUserId(c *gin.Context) (int64, error) {
 	u, exist := c.Get(constant.ContextKeyUserObj)
 	if !exist {
 		return 0, errors.New("can't get user id")
 	}
-	user, ok := u.(*vo.JwtUser)
+	user, ok := u.(*VO.JwtUser)
 
 	if ok {
 		return user.Id, nil
@@ -230,20 +230,20 @@ func GetAdminUserId(c *gin.Context) (int64, error) {
 	return 0, errors.New("can't convert to user struct")
 }
 
-//返回user
-func GetAdminUser(c *gin.Context) (*vo.JwtUser, error) {
+// 返回user
+func GetAdminUser(c *gin.Context) (*VO.JwtUser, error) {
 	u, exist := c.Get(constant.ContextKeyUserObj)
 	if !exist {
 		return nil, errors.New("can't get user id")
 	}
-	user, ok := u.(*vo.JwtUser)
+	user, ok := u.(*VO.JwtUser)
 	if ok {
 		return user, nil
 	}
 	return nil, errors.New("can't convert to user struct")
 }
 
-//返回 detail user
+// 返回 detail user
 func GetAdminDetailUser(c *gin.Context) *model.SysUser {
 	mytoken := c.Request.Header.Get("Authorization")
 	token := strings.TrimSpace(mytoken[bearerLength:])

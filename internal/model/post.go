@@ -3,6 +3,7 @@ package model
 import (
 	"bbs/pkg/global"
 	"net"
+	"time"
 )
 
 // 帖子属性，根据不同类型做不同解析
@@ -41,4 +42,20 @@ func (p *Post) Delete() error {
 func (p *Post) GetById() (post *Post, err error) {
 	err = global.Db.First(p).Error()
 	return p, err
+}
+
+// GetPostsByUpdateTime 从MySQL中返回某个时间段后指定数量的帖子
+func (p *Post) GetPostsByUpdateTime(num int, uDate time.Time) (posts *[]Post, err error) {
+	if err = global.Db.Where("updateTime < ? ", uDate).Order("updateTime desc").Find(posts).Limit(num).Error(); err != nil {
+		return nil, err
+	}
+	return posts, err
+}
+
+// GetPostsByCreateTime 从MySQL中返回某个时间段后指定数量的帖子
+func (p *Post) GetPostsByCreateTime(num int, uDate time.Time) (posts *[]Post, err error) {
+	if err = global.Db.Where("createTime < ? ", uDate).Order("updateTime desc").Find(posts).Limit(num).Error(); err != nil {
+		return nil, err
+	}
+	return posts, err
 }

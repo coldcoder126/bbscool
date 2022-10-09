@@ -1,8 +1,10 @@
 package model
 
 import (
+	"bbs/internal/model/DO"
 	"bbs/pkg/global"
 	"gorm.io/gorm"
+	"strings"
 )
 
 // SysUser 用户基本信息，用于登录
@@ -16,7 +18,7 @@ type SysUser struct {
 	Gender   int8   //性别
 	School   string //学校列表
 	Avatar   string //头像Url
-	Status   int    //账号状态
+	Status   int8   //账号状态
 	BaseModel
 }
 
@@ -39,7 +41,7 @@ func (user *SysUser) GetRedisUser() []interface{} {
 	return r
 }
 
-func (SysUser) TableName() string {
+func (*SysUser) TableName() string {
 	return "sys_user"
 }
 
@@ -65,6 +67,16 @@ func (user *SysUser) UpdateUser() error {
 		}
 		return nil
 	})
+}
+
+func (user *SysUser) ToCachedUser() *DO.CachedUser {
+	schoolList := strings.Split(user.School, ",")
+	u := &DO.CachedUser{
+		Username: user.Username,
+		Status:   user.Status,
+		School:   schoolList,
+	}
+	return u
 }
 
 func (user *SysUser) GetUserInfo() error {

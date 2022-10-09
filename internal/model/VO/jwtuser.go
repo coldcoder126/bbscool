@@ -1,4 +1,4 @@
-package vo
+package VO
 
 type JwtUser struct {
 	Id       int64

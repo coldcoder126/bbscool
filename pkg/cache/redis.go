@@ -185,10 +185,10 @@ func (r *Redis) Get(key string) interface{} {
 	return value
 }
 
-func (r *Redis) HGet(key, field string) string {
+func (r *Redis) HGet(key, field string) (string, error) {
 	if len(key) == 0 {
 		CacheStdLogger.Println("empty key")
-		return ""
+		return "", errors.New("HGet empty key ")
 	}
 	defer func() {
 		trace(key, "", "get", r)
@@ -199,14 +199,14 @@ func (r *Redis) HGet(key, field string) string {
 		if err != nil && err != redis.Nil {
 			CacheStdLogger.Printf("cache get key: %s field: %s err %v", key, field, err)
 		}
-		return value
+		return value, err
 	}
 
 	value, err := r.clusterClient.Get(ctx, key).Result()
 	if err != nil && err != redis.Nil {
 		CacheStdLogger.Printf("cache get key: %s err %v", key, err)
 	}
-	return value
+	return value, err
 }
 
 func (r *Redis) HSet(key, field string, value interface{}, ttl time.Duration) error {

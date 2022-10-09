@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"bbs/internal/model"
+	"bbs/internal/model/VO"
 	"bbs/pkg/app"
 	"bbs/pkg/constant"
 	"bbs/pkg/jwt"
@@ -89,7 +91,37 @@ func Jwt() gin.HandlerFunc {
 	}
 }
 
-//url排除
+// ScopeAuthCheck 检查用户账号是否正常
+func ScopeAuthCheck() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		u, exist := c.Get(constant.ContextKeyUserObj)
+		if !exist {
+			app.Response(c, http.StatusForbidden, constant.ERROR_AUTH_CHECK_FAIL, nil)
+			c.Abort()
+			return
+		}
+		user, ok := u.(*VO.JwtUser)
+		if !ok {
+			app.Response(c, http.StatusForbidden, constant.ERROR_AUTH_CHECK_FAIL, nil)
+			c.Abort()
+			return
+		}
+
+		if user.Status != model.UserStatusOk {
+			app.Response(c, http.StatusForbidden, constant.ERROR_AUTH_CHECK_FAIL, nil)
+			c.Abort()
+			return
+		}
+
+		c.Next()
+	}
+	// 1. 检查用户的状态
+
+	// 2. 检查用户的school列表
+	// 3. 检查学校的friends列表
+}
+
+// url排除
 func urlExclude(url string) bool {
 	//公共路由直接放行
 	reg := regexp.MustCompile(`[0-9]+`)

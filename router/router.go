@@ -20,5 +20,8 @@ func InitRouter() *gin.Engine {
 		loginRouter.POST("login-by-refresh-token", loginController.LoginByRefreshToken)
 	}
 
+	// 发布api，需要鉴权
+	postController := front.PostController{}
+
 	return r
 }
